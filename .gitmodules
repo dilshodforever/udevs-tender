@@ -1,0 +1,3 @@
+[submodule "golang-compition-2024"]
+	path = golang-compition-2024
+	url = git@github.com:golanguzb70/golang-compition-2024.git
