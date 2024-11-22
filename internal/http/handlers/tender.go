@@ -201,8 +201,6 @@ func (h *HTTPHandler) AwardTender(ctx *gin.Context) {
 		ctx.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
 	 }
-	
-
 
 	err = h.TenderService.AwardTender(int64(tenderID), clientID, int64(bidID))
 	if err != nil {

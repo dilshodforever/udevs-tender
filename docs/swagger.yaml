@@ -1,0 +1,605 @@
+definitions:
+  model.Bid:
+    properties:
+      comments:
+        type: string
+      contractor_id:
+        type: integer
+      delivery_time:
+        type: integer
+      id:
+        type: integer
+      price:
+        type: number
+      status:
+        description: Restrict status to predefined values
+        type: string
+      tender_id:
+        type: integer
+    type: object
+  model.Tender:
+    properties:
+      awarded_contractor_id:
+        type: integer
+      budget:
+        type: number
+      client_id:
+        type: integer
+      deadline:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      status:
+        description: Restrict status to predefined values
+        type: string
+      title:
+        type: string
+    type: object
+  tender-backend_model_request.CreateBidReq:
+    properties:
+      comments:
+        type: string
+      delivery_time:
+        type: integer
+      price:
+        type: number
+    type: object
+  tender-backend_model_request.CreateTenderReq:
+    properties:
+      budget:
+        type: number
+      deadline:
+        type: string
+      description:
+        type: string
+      title:
+        type: string
+    type: object
+  tender-backend_model_request.CreateUserReq:
+    properties:
+      email:
+        type: string
+      full_name:
+        type: string
+      password:
+        type: string
+      role:
+        type: string
+      username:
+        type: string
+    type: object
+  tender-backend_model_request.LoginUserReq:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  tender-backend_model_request.UpdateTenderReq:
+    properties:
+      status:
+        type: string
+    type: object
+  tender-backend_model_request.UpdateUserReq:
+    properties:
+      email:
+        type: string
+      full_name:
+        type: string
+    type: object
+  tender-backend_model_response.LoginRes:
+    properties:
+      role:
+        type: string
+      token:
+        type: string
+    type: object
+  tender-backend_model_response.ProfileRes:
+    properties:
+      email:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: integer
+      role:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: This is the API Gateway for the Tender project.
+  title: Tender API Gateway
+  version: "1.0"
+paths:
+  /api/client/contractor/tenders/{tender_id}/bids:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all Bids for the authenticated user.
+      parameters:
+      - description: Tender ID
+        in: path
+        name: tender_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: All bids retrieved successfully
+          schema:
+            items:
+              $ref: '#/definitions/model.Bid'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get all Bids
+      tags:
+      - Bid
+  /api/client/tenders:
+    get:
+      description: Get all tenders
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Tender'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Get all tenders
+      tags:
+      - Tender
+  /api/client/tenders/{tender_id}:
+    delete:
+      description: Delete a tender by ID
+      parameters:
+      - description: Tender ID
+        in: path
+        name: tender_id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+      security:
+      - BearerAuth: []
+      summary: Delete a tender by ID
+      tags:
+      - Tender
+    get:
+      description: Get a tender by ID
+      parameters:
+      - description: Tender ID
+        in: path
+        name: tender_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Tender'
+      security:
+      - BearerAuth: []
+      summary: Get a tender by ID
+      tags:
+      - Tender
+    put:
+      consumes:
+      - application/json
+      description: Update a tender by ID
+      parameters:
+      - description: Tender ID
+        in: path
+        name: tender_id
+        required: true
+        type: integer
+      - description: Tender information
+        in: body
+        name: tender
+        required: true
+        schema:
+          $ref: '#/definitions/tender-backend_model_request.UpdateTenderReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Tender'
+      security:
+      - BearerAuth: []
+      summary: Update a tender by ID
+      tags:
+      - Tender
+  /api/client/tenders/{tender_id}/award/{bid_id}:
+    post:
+      consumes:
+      - application/json
+      description: Award a tender
+      parameters:
+      - description: Tender ID
+        in: path
+        name: tender_id
+        required: true
+        type: integer
+      - description: Bid ID
+        in: path
+        name: bid_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Tender'
+      security:
+      - BearerAuth: []
+      summary: Award a tender
+      tags:
+      - Tender
+  /api/contractor/bids:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all Bids for the authenticated Contractor.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: All bids retrieved successfully
+          schema:
+            items:
+              $ref: '#/definitions/model.Bid'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get all Bids for a Contractor
+      tags:
+      - Bid
+  /api/contractor/bids/{bid_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a Bid by its ID.
+      parameters:
+      - description: Bid ID
+        in: path
+        name: bid_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Bid deleted successfully
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Bid not found
+          schema:
+            type: string
+        "500":
+          description: Server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Delete a Bid
+      tags:
+      - Bid
+  /api/contractor/tenders/{tender_id}/bid:
+    post:
+      consumes:
+      - application/json
+      description: 'Creates a new bid. Example time: 2024-11-16T15:00:00Z'
+      parameters:
+      - description: Tender ID
+        in: path
+        name: tender_id
+        required: true
+        type: string
+      - description: Bid creation request
+        in: body
+        name: bid
+        required: true
+        schema:
+          $ref: '#/definitions/tender-backend_model_request.CreateBidReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Bid created successfully
+          schema:
+            $ref: '#/definitions/model.Bid'
+        "400":
+          description: Invalid request payload
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Create a new bid
+      tags:
+      - Bid
+  /api/contractor/tenders/{tender_id}/bid/{bid_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a bid by its ID.
+      parameters:
+      - description: Tender ID
+        in: path
+        name: tender_id
+        required: true
+        type: string
+      - description: Bid ID
+        in: path
+        name: bid_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Bid retrieved successfully
+          schema:
+            $ref: '#/definitions/model.Bid'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Bid not found
+          schema:
+            type: string
+        "500":
+          description: Server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get Bid by ID
+      tags:
+      - Bid
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user with email and password
+      parameters:
+      - description: User login credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/tender-backend_model_request.LoginUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: JWT tokens
+          schema:
+            $ref: '#/definitions/tender-backend_model_response.LoginRes'
+        "400":
+          description: Invalid request payload
+          schema:
+            type: string
+        "401":
+          description: Invalid email or password
+          schema:
+            type: string
+      summary: Login a user
+      tags:
+      - Authentication
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with email, username, and password
+      parameters:
+      - description: User registration request
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/tender-backend_model_request.CreateUserReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: JWT tokens
+          schema:
+            $ref: '#/definitions/tender-backend_model_response.LoginRes'
+        "400":
+          description: Invalid request payload
+          schema:
+            type: string
+        "500":
+          description: Server error
+          schema:
+            type: string
+      summary: Register a new user
+      tags:
+      - Authentication
+  /tenders:
+    post:
+      consumes:
+      - application/json
+      description: Create a new tender
+      parameters:
+      - description: Tender information
+        in: body
+        name: tender
+        required: true
+        schema:
+          $ref: '#/definitions/tender-backend_model_request.CreateTenderReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Tender'
+      security:
+      - BearerAuth: []
+      summary: Create a new tender
+      tags:
+      - Tender
+  /users:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a user by their ID
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: User deleted successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid user ID
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: User not found
+          schema:
+            type: string
+        "500":
+          description: Server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Delete user by ID
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      description: Updates a user's information by their ID
+      parameters:
+      - description: User update request
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/tender-backend_model_request.UpdateUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User updated successfully
+          schema:
+            $ref: '#/definitions/tender-backend_model_response.ProfileRes'
+        "400":
+          description: Invalid request payload
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: User not found
+          schema:
+            type: string
+        "500":
+          description: Server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Update user by ID
+      tags:
+      - User
+  /users/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a user by their ID.
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User retrieved successfully
+          schema:
+            $ref: '#/definitions/tender-backend_model_response.ProfileRes'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: User not found
+          schema:
+            type: string
+        "500":
+          description: Server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get user by ID
+      tags:
+      - User
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
+tags:
+- description: User registration and login methods
+  name: Authentication
+- description: Tender CRUDs
+  name: Tender
+- description: Bid methods
+  name: Bid
