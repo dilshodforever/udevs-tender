@@ -1,39 +1,55 @@
-version: '3.8'
+version: '3.9'
 
 services:
-  db:
+  # postgres
+  postgres-db:
+    container_name: postgres-tender
     image: postgres:latest
-    container_name: postgres-db
-    env_file:
-      - .env
     environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
-    ports:
-      - ${DB_PORT}:${DB_PORT}
+      PGUSER: postgres
+      POSTGRES_PASSWORD: 1234
+      PGDATA: /data/postgres
+      POSTGRES_DB: tender
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - db:/post-database/post-memory
+    ports:
+      - "5434:5432"
+    networks:
+      - mynetwork
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
   redis:
     image: redis:latest
     container_name: redis
     ports:
-      - "6380:6379"
+      - "6378:6379"
     volumes:
       - redis-data:/data
-
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: tender-backend
-    env_file:
-      - .env
+    networks:
+      - mynetwork
+  # tender-service
+  tender-service:
+    container_name: tender-service
+    build: .
     ports:
-      - ${APP_DOCKER_PORT}:${APP_DOCKER_PORT}
+      - "8888:8888"
     depends_on:
-      - db
+      - postgres-db
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    external: true
+    name: tender-network
+    driver: bridge
 
 volumes:
-  db_data:
+  db:
   redis-data:
+    driver: local
+

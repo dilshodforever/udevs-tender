@@ -196,10 +196,13 @@ func (h *HTTPHandler) AwardTender(ctx *gin.Context) {
 		return
 	}
 
-	if !h.BidService.IsBidExists(int64(bidID)) {
-		ctx.JSON(http.StatusNotFound, gin.H{"message": "Bid not found"})
+	 err=h.BidService.IsBidExists(int64(bidID), int64(tenderID))
+	 if err!=nil{
+		ctx.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
-	}
+	 }
+	
+
 
 	err = h.TenderService.AwardTender(int64(tenderID), clientID, int64(bidID))
 	if err != nil {

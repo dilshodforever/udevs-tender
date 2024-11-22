@@ -162,9 +162,22 @@ func (s *BidService) clearBidsCache(tenderID int64) {
 }
 
 
-func (s *BidService) IsBidExists(bidID int64) bool {
-	var bid model.Bid
-	err := s.db.First(&bid, bidID).Error;
-	return err == nil
+
+func (s *BidService) IsBidExists(bidID int64, tenderID int64) error {
+    var bid model.Bid
+    err := s.db.First(&bid, bidID).Error
+
+    // Bid mavjudligini tekshirish
+    if err != nil {
+        return errors.New("Bid not found")
+    }
+
+    // Tender ID mos kelmasligini tekshirish
+    if bid.TenderID != tenderID {
+        return errors.New("Tender not found or access denied")
+    }
+
+    return nil
 }
+
 

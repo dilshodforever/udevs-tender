@@ -6,7 +6,7 @@ run-db:
 
 # Command to build and run the Go app using Docker Compose
 run:
-	docker-compose up -d app --build
+	sudo docker compose up --build 
 
 local-run:
 	go run ./cmd/main.go
