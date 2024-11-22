@@ -69,23 +69,6 @@ The backend API will be available at `http://localhost:[PORT]`, where `PORT` is 
 ## Development Workflow
 
 
-### Stop and Clean Services:
-```bash
-make stop
-```
-
----
-
-## Key Configurations and Tools Used
-
-- **Rate Limiting:** Redis is utilized to restrict excessive actions from clients, such as multiple bid submissions within a short period.
-- **Caching:** Redis caches commonly used data like tender lists to reduce database load and speed up responses.
-- **Error Logging:** A custom logger captures application errors, providing detailed insights for debugging and monitoring.
-- **Session Management:** Redis handles session tokens for efficient and secure user authentication.
-- **Swagger:** Comprehensive API documentation is automatically generated for easy exploration of available endpoints.
-- **WebSockets:** WebSockets are used for real-time notifications to clients. When a notification is created, it is pushed to the corresponding user over an active WebSocket connection.
-- **RabbitMQ:** RabbitMQ handles message queuing for asynchronous processing of notifications. It ensures that notifications are reliably delivered to users.
----
 
 ## Contribution Guidelines
 
